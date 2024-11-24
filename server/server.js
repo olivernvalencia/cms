@@ -4,6 +4,7 @@ import cors from 'cors';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import cookieParser from 'cookie-parser';
+import pg from 'pg';
 const salt = 10;
 
 const app = express();
@@ -17,13 +18,25 @@ app.use(cors({
 
 app.use(cookieParser());
 
+
 const db = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: '',
+    port: '3307',
+    password: 'DuSt3YVgJ2',
     database: 'dbcbs',
 })
 
+/*
+const Pool = pg.Pool
+const db = new Pool({
+  user: 'dbcbs_admin',
+  host: 'localhost',
+  database: 'dbcbs',
+  password: 'DuSt3YVgJ2',
+  port: 5432,
+});
+*/
 app.get('/set-cookie', (req, res) => {
     res.cookie('testCookie', 'testValue', {
         httpOnly: true,
@@ -148,9 +161,9 @@ app.get('/residents', verifyUser, (req, res) => {
 
 app.post('/add-resident', async (req, res) => {
     const {
-        ResidentID, FirstName, LastName, MiddleName, Age, birthday, Gender,
-        Address, ContactNumber, Email, CivilStatus, Occupation, HouseholdID,
-        BarangayID, RegistrationDate, Status, RegisteredVoter, VoterIDNumber, VotingPrecinct
+        FirstName, LastName, MiddleName, Age, birthday, Gender,
+        Address, ProvinceID, CityID, BarangayID, ContactNumber, Email, CivilStatus, Occupation, HouseholdID,
+        JuanBataanID, RegistrationDate, Status, RegisteredVoter, VoterIDNumber, VotingPrecinct
     } = req.body;
 
     if (!FirstName || !LastName || !Age || !Gender || !Address || !ContactNumber) {
@@ -160,10 +173,10 @@ app.post('/add-resident', async (req, res) => {
     try {
         const query = `
             INSERT INTO cbs_resident 
-            (ResidentID, FirstName, LastName, MiddleName, Age, birthday, Gender, Address, ContactNumber, Email, CivilStatus, Occupation, HouseholdID, JuanBataanID, RegistrationDate, Status, RegisteredVoter, VoterIDNumber, VotingPrecinct)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            (FirstName, LastName, MiddleName, Age, birthday, Gender, Address, Province_ID, City_ID, Barangay_ID, ContactNumber, Email, CivilStatus, Occupation, HouseholdID, JuanBataanID, RegistrationDate, Status, RegisteredVoter, VoterIDNumber, VotingPrecinct)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
-        const values = [ResidentID, FirstName, LastName, MiddleName, Age, birthday, Gender, Address, ContactNumber, Email, CivilStatus, Occupation, HouseholdID, BarangayID, RegistrationDate, Status, RegisteredVoter, VoterIDNumber, VotingPrecinct];
+        const values = [FirstName, LastName, MiddleName, Age, birthday, Gender, Address, ProvinceID, CityID, BarangayID, ContactNumber, Email, CivilStatus, Occupation, HouseholdID, JuanBataanID, RegistrationDate, Status, RegisteredVoter, VoterIDNumber, VotingPrecinct];
 
         await db.query(query, values);
         res.status(201).json({ message: 'Resident added successfully' });
@@ -311,3 +324,70 @@ app.get('/logout', (req, res) => {
 app.listen(8080, () => {
     console.log('listen')
 })
+
+app.get('/get-provinces', verifyUser, (req, res) => {
+    const sql = `
+        SELECT iid, iname FROM ph_provinces
+    `;
+
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error('Database error:', err);
+            return res.status(500).json({ Error: 'Failed to retrieve resident data' });
+        }
+        res.json(results);
+    });
+});
+
+
+app.post('/get-cities', (req, res) => {
+    const { ProvinceID } = req.body;
+
+    if (!ProvinceID) {
+        return res.status(400).json({ message: 'Please select province first.' });
+    }
+
+    try {
+        const query = `
+            SELECT * FROM ph_cities where province_id = ?
+        `;
+        const values = [ProvinceID];
+
+        db.query(query, values, (err, results) => {
+            if (err) {
+                console.error('Database error:', err);
+                return res.status(500).json({ Error: 'Failed to retrieve resident data' });
+            }
+            res.json(results);
+        });
+    } catch (error) {
+        console.error("Failed to get list of cities:", error);
+        res.status(500).json({ message: 'Failed to get list of cities' });
+    }
+});
+
+app.post('/get-barangays', (req, res) => {
+    const { CityID } = req.body;
+
+    if (!CityID) {
+        return res.status(400).json({ message: 'Please select province first.' });
+    }
+
+    try {
+        const query = `
+            SELECT * FROM ph_barangays where city_id = ?
+        `;
+        const values = [CityID];
+
+        db.query(query, values, (err, results) => {
+            if (err) {
+                console.error('Database error:', err);
+                return res.status(500).json({ Error: 'Failed to retrieve resident data' });
+            }
+            res.json(results);
+        });
+    } catch (error) {
+        console.error("Failed to get list of cities:", error);
+        res.status(500).json({ message: 'Failed to get list of cities' });
+    }
+});

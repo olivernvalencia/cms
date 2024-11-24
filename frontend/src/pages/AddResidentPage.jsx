@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import JuanBataanLogo from '../assets/juanbataan.png';
@@ -15,7 +15,6 @@ import { IoIosFingerPrint } from "react-icons/io";
 const AddResidentPage = ({ setSuccess }) => {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
-        ResidentID: '',
         FirstName: '',
         LastName: '',
         MiddleName: '',
@@ -37,6 +36,12 @@ const AddResidentPage = ({ setSuccess }) => {
     });
     const [errorMessage, setErrorMessage] = useState('');
     const [loading, setLoading] = useState(false);
+    const [options, setoptions] = useState([]);
+    const [ProvinceID, setProvinceID] = useState(10);
+    const [Cityoptions, setCityoptions] = useState([]);
+    const [CityID, setCityID] = useState(2269);
+    const [Barangayoptions, setBarangayoptions] = useState([]);
+    const [BarangayID, setBarangayID] = useState(5628);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -81,7 +86,7 @@ const AddResidentPage = ({ setSuccess }) => {
         if (!validateFormData()) return;
 
         try {
-            await axios.post('http://localhost:8080/add-resident', formData, { withCredentials: true });
+            await axios.post('http://localhost:8080/add-resident', (formData, ProvinceID, CityID, BarangayID), { withCredentials: true });
             sessionStorage.setItem('residentAddedSuccess', 'true');
             navigate('/resident-management');
         } catch (error) {
@@ -90,6 +95,51 @@ const AddResidentPage = ({ setSuccess }) => {
             setLoading(false);
         }
     };
+       
+    useEffect(() => {
+        // Fetch data from the API
+        axios.get('http://localhost:8080/get-provinces', { withCredentials: true })
+        .then(response => {
+            setoptions(response.data);
+        })
+        .catch(error => {
+        console.error('There was an error fetching the data!', error);
+        });
+        });
+        
+    const ProvincehandleChange = (event) => {
+            setProvinceID(event.target.value);
+        };
+
+    useEffect(() => {
+        // Fetch data from the API
+        axios.post('http://localhost:8080/get-cities', {ProvinceID}, { withCredentials: true })
+        .then(response => {
+            setCityoptions(response.data);
+        })
+        .catch(error => {
+        console.error('There was an error fetching the data!', error);
+        });
+        });
+
+    const CityhandleChange = (event) => {
+        setCityID(event.target.value);
+        };
+
+    useEffect(() => {
+        // Fetch data from the API
+        axios.post('http://localhost:8080/get-barangays', {CityID}, { withCredentials: true })
+        .then(response => {
+            setBarangayoptions(response.data);
+        })
+        .catch(error => {
+        console.error('There was an error fetching the data!', error);
+        });
+        });
+    
+    const BarangayhandleChange = (event) => {
+        setBarangayID(event.target.value);
+        };
 
     return (
         <div className="flex flex-col h-screen">
@@ -189,6 +239,39 @@ const AddResidentPage = ({ setSuccess }) => {
                                         <div>
                                             <label className="block mb-2 text-sm font-medium text-gray-500">Address</label>
                                             <input type="text" name="Address" value={formData.Address} onChange={handleChange} required placeholder='#12 Rizal St. Quezon City' className="border text-sm border-gray-300 p-2 w-full text-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                        </div>
+                                        <div>
+										    <label className="block mb-2 text-sm font-medium text-gray-500">Province</label>
+                                            <select name="ProvinceID" value={ProvinceID} onChange={ProvincehandleChange} required className="border text-sm border-gray-300 p-2 w-full rounded-md text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                                <option value="">Select Province</option>
+                                                {options.map(option => (
+                                                    <option key={option.iid} value={option.iid}>
+                                                        {option.iname}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <div>
+										    <label className="block mb-2 text-sm font-medium text-gray-500">City</label>
+                                            <select name="CityID" value={CityID} onChange={CityhandleChange} required className="border text-sm border-gray-300 p-2 w-full rounded-md text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                                <option value="">Select City</option>
+                                                {Cityoptions.map(option => (
+                                                    <option key={option.iid} value={option.iid}>
+                                                        {option.iname}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <div>
+										    <label className="block mb-2 text-sm font-medium text-gray-500">Barangay</label>
+                                            <select name="BarangayID" value={BarangayID} onChange={BarangayhandleChange} required className="border text-sm border-gray-300 p-2 w-full rounded-md text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                                <option value="">Select Barangay</option>
+                                                {Barangayoptions.map(option => (
+                                                    <option key={option.iid} value={option.iid}>
+                                                        {option.iname}
+                                                    </option>
+                                                ))}
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
