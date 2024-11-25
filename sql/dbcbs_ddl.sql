@@ -1,7 +1,7 @@
 CREATE TABLE `ph_regions` (
 	`iid` INT(3) NOT NULL,
-	`iname` VARCHAR(100) NULL DEFAULT NULL COLLATE 'utf8mb3_general_ci',
-	`icode` VARCHAR(100) NULL DEFAULT NULL COLLATE 'utf8mb3_general_ci',
+	`iname` VARCHAR(100) NOT NULL COLLATE 'utf8mb3_general_ci',
+	`icode` VARCHAR(100) NOT NULL COLLATE 'utf8mb3_general_ci',
 	PRIMARY KEY (`iid`) USING BTREE,
 	UNIQUE INDEX `iname` (`iname`, `icode`) USING BTREE
 )
@@ -11,9 +11,9 @@ ENGINE=InnoDB
 
 CREATE TABLE `ph_provinces` (
 	`iid` INT(4) NOT NULL AUTO_INCREMENT,
-	`iname` VARCHAR(100) NULL DEFAULT NULL COLLATE 'utf8mb3_general_ci',
-	`icode` VARCHAR(100) NULL DEFAULT NULL COLLATE 'utf8mb3_general_ci',
-	`region_id` INT(4) NULL DEFAULT NULL,
+	`iname` VARCHAR(100) NOT NULL COLLATE 'utf8mb3_general_ci',
+	`icode` VARCHAR(100) NOT COLLATE 'utf8mb3_general_ci',
+	`region_id` INT(4) NOT NULL,
 	`province_logo` varchar(256),
 	PRIMARY KEY (`iid`) USING BTREE,
 	UNIQUE INDEX `iname` (`iname`, `icode`) USING BTREE,
@@ -27,9 +27,9 @@ AUTO_INCREMENT=129
 
 CREATE TABLE `ph_cities` (
 	`iid` INT(4) NOT NULL AUTO_INCREMENT,
-	`iname` VARCHAR(100) NULL DEFAULT NULL COLLATE 'utf8mb3_general_ci',
-	`icode` VARCHAR(100) NULL DEFAULT NULL COLLATE 'utf8mb3_general_ci',
-	`province_id` INT(4) NULL DEFAULT NULL,
+	`iname` VARCHAR(100) NOT NULL COLLATE 'utf8mb3_general_ci',
+	`icode` VARCHAR(100) NOT NULL COLLATE 'utf8mb3_general_ci',
+	`province_id` INT(4) NOT NULL,
 	`city_logo` varchar(256),
 	PRIMARY KEY (`iid`) USING BTREE,
 	UNIQUE INDEX `iname` (`iname`, `icode`) USING BTREE,
@@ -43,9 +43,9 @@ AUTO_INCREMENT=3695
 
 CREATE TABLE `ph_barangays` (
 	`iid` INT(4) NOT NULL AUTO_INCREMENT,
-	`iname` VARCHAR(100) NULL DEFAULT NULL COLLATE 'utf8mb3_general_ci',
-	`icode` VARCHAR(100) NULL DEFAULT NULL COLLATE 'utf8mb3_general_ci',
-	`city_id` INT(4) NULL DEFAULT NULL,
+	`iname` VARCHAR(100) NOT NULL COLLATE 'utf8mb3_general_ci',
+	`icode` VARCHAR(100) NOT NULL COLLATE 'utf8mb3_general_ci',
+	`city_id` INT(4) NOT NULL,
 	`brgy_logo` varchar(256),
 	PRIMARY KEY (`iid`) USING BTREE,
 	UNIQUE INDEX `iname` (`iname`, `icode`, `city_id`) USING BTREE,
