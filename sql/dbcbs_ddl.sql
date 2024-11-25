@@ -1,3 +1,17 @@
+CREATE TABLE lgu_types (
+iid INT(3) NOT NULL,
+iname VARCHAR(50) NOT NULL,
+comments VARCHAR(60),
+PRIMARY KEY (iid),
+UNIQUE  (iname)
+);
+
+INSERT INTO lgu_types
+VALUES
+(1, 'Barangay', NULL),
+(2, 'Minicipal', NULL),
+(3, 'Provincial', NULL);
+
 CREATE TABLE `ph_regions` (
 	`iid` INT(3) NOT NULL,
 	`iname` VARCHAR(100) NOT NULL COLLATE 'utf8mb3_general_ci',
@@ -57,15 +71,43 @@ ENGINE=InnoDB
 AUTO_INCREMENT=42030
 ;
 
+---View
+create or replace view `ph_addresses_vw` AS SELECT 
+b.iid brgy_id,
+b.iname brgy_name,
+b.icode brgy_icode,
+b.brgy_logo brgy_logo,
+c.iid city_id,
+c.iname city_name,
+c.icode city_icode,
+c.city_logo city_logo,
+p.iid province_id,
+p.iname province_name,
+p.icode province_icode,
+p.province_logo province_logo,
+r.iid region_id,
+r.iname region_name,
+r.icode region_icode
+FROM ph_barangays b
+JOIN ph_cities c ON (b.city_id=c.iid)
+JOIN ph_provinces p ON (c.province_id=p.iid)
+JOIN ph_regions r ON (p.region_id=r.iid);
+
 
 CREATE TABLE `cbs_users` (
 	`iid` INT(11) NOT NULL AUTO_INCREMENT,
 	`users` VARCHAR(255) NOT NULL COLLATE 'utf8mb4_general_ci',
 	`password` VARCHAR(255) NOT NULL COLLATE 'utf8mb4_general_ci',
 	`role` VARCHAR(255) NOT NULL COLLATE 'utf8mb4_general_ci',
-	`Barangay_ID` INT(10) NOT NULL,
+	`Barangay_ID` INT(10) NOT NULL default 0,
+	`city_id` INT(10) NOT NULL default 0,
+	`province_id` INT(10) NOT NULL default 0,
+	`lgu_type_id` INT(3) NOT NULL,
 	PRIMARY KEY (`id`),
-	FOREIGN KEY (`Barangay_ID`) REFERENCES `ph_barangays` (`iid`)
+	FOREIGN KEY (`Barangay_ID`) REFERENCES `ph_barangays` (`iid`),
+	FOREIGN KEY (`city_id`) REFERENCES `ph_cities` (`iid`),
+	FOREIGN KEY (`province_id`) REFERENCES `ph_provinces` (`iid`),
+	FOREIGN KEY (`lgu_type_id`) REFERENCES `lgu_types` (`iid`)
 )
 COLLATE='utf8mb4_general_ci'
 ENGINE=InnoDB
@@ -79,7 +121,7 @@ CREATE TABLE `cbs_residents` (
 	`MiddleName` VARCHAR(50) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci',
 	`Age` INT(10) NOT NULL,
 	`birthday` DATE NOT NULL,
-	`Gender` VARCHAR(10) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci',
+	`Gender` VARCHAR(10) NOT NULL COLLATE 'utf8mb4_general_ci',
 	`Address` VARCHAR(255) NOT NULL COLLATE 'utf8mb4_general_ci',
 	`Province_ID` INT(10) NOT NULL,
 	`City_ID` INT(10) NOT NULL,

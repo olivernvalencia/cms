@@ -147,7 +147,14 @@ app.get('/registered-voters', verifyUser, (req, res) => {
 // Endpoint to get resident details
 app.get('/residents', verifyUser, (req, res) => {
     const sql = `
-        SELECT * FROM cbs_resident
+        select ResidentID,FirstName,LastName,MiddleName,Age,
+        birthday,Gender,Address,ContactNumber,Email,CivilStatus,Occupation,
+        HouseholdID,JuanBataanID,RegistrationDate,Status,RegisteredVoter,VoterIDNumber,
+        VotingPrecinct,
+        (select iname from ph_barangays where iid = Barangay_ID) Barangay,
+        (select iname from ph_cities where iid = City_ID) City,
+        (select iname from ph_provinces where iid = Province_ID) Province
+        from cbs_resident
     `;
 
     db.query(sql, (err, results) => {
@@ -166,9 +173,9 @@ app.post('/add-resident', async (req, res) => {
         JuanBataanID, RegistrationDate, Status, RegisteredVoter, VoterIDNumber, VotingPrecinct
     } = req.body;
 
-    if (!FirstName || !LastName || !Age || !Gender || !Address || !ContactNumber) {
-        return res.status(400).json({ message: 'Please fill in all required fields.' });
-    }
+    //if (!FirstName || !LastName || !Age || !Gender || !Address || !ContactNumber) {
+    //    return res.status(400).json({ message: 'Please fill in all required fields.' });
+    //}
 
     try {
         const query = `
@@ -190,8 +197,8 @@ app.post('/add-resident', async (req, res) => {
 app.put('/update-resident/:id', async (req, res) => {
     console.log("Request Body:", req.body); // Log the entire request body
     const {
-        FirstName, LastName, MiddleName, Age, birthday, Gender, Address, ContactNumber,
-        Email, CivilStatus, Occupation, HouseholdID, JuanBataanID, RegistrationDate,
+        FirstName, LastName, MiddleName, Age, birthday, Gender, Address, ProvinceID, CityID, BarangayID, 
+        ContactNumber, Email, CivilStatus, Occupation, HouseholdID, JuanBataanID, RegistrationDate,
         Status, RegisteredVoter, VoterIDNumber, VotingPrecinct
     } = req.body;
 
@@ -206,13 +213,13 @@ app.put('/update-resident/:id', async (req, res) => {
         const query = `
             UPDATE cbs_resident
             SET FirstName = ?, LastName = ?, MiddleName = ?, Age = ?, birthday = ?, Gender = ?,
-                Address = ?, ContactNumber = ?, Email = ?, CivilStatus = ?, Occupation = ?, 
+                Address = ?, Province_ID = ?, City_ID = ?, Barangay_ID = ?, ContactNumber = ?, Email = ?, CivilStatus = ?, Occupation = ?, 
                 HouseholdID = ?, JuanBataanID = ?, RegistrationDate = ?, Status = ?, 
                 RegisteredVoter = ?, VoterIDNumber = ?, VotingPrecinct = ?
             WHERE ResidentID = ?
         `;
         const values = [
-            FirstName, LastName, MiddleName, Age, birthday, Gender, Address, ContactNumber,
+            FirstName, LastName, MiddleName, Age, birthday, Gender, Address, ProvinceID, CityID, BarangayID, ContactNumber,
             Email, CivilStatus, Occupation, HouseholdID, JuanBataanID, RegistrationDate,
             Status, RegisteredVoter, VoterIDNumber, VotingPrecinct, ResidentID
         ];
@@ -378,6 +385,29 @@ app.post('/get-barangays', (req, res) => {
             SELECT * FROM ph_barangays where city_id = ?
         `;
         const values = [CityID];
+
+        db.query(query, values, (err, results) => {
+            if (err) {
+                console.error('Database error:', err);
+                return res.status(500).json({ Error: 'Failed to retrieve resident data' });
+            }
+            res.json(results);
+        });
+    } catch (error) {
+        console.error("Failed to get list of cities:", error);
+        res.status(500).json({ message: 'Failed to get list of cities' });
+    }
+});
+
+
+app.post('/get-barangay-details', (req, res) => {
+    const { BarangayID } = req.body;
+
+    try {
+        const query = `
+            SELECT * FROM ph_addresses_vw where brgy_id = ?
+        `;
+        const values = [BarangayID];
 
         db.query(query, values, (err, results) => {
             if (err) {

@@ -1,5 +1,6 @@
 --ph_regions
 INSERT INTO `ph_regions` (`iid`, `iname`, `icode`) VALUES
+    (0, 'Dummy Region', '0'),
 	(1, 'Region I (Ilocos Region)', '01'),
 	(2, 'Region II (Cagayan Valley)', '02'),
 	(3, 'Region III (Central Luzon)', '03'),
@@ -20,6 +21,7 @@ INSERT INTO `ph_regions` (`iid`, `iname`, `icode`) VALUES
 
 --ph_provinces
 INSERT INTO `ph_provinces` (`iid`, `iname`, `icode`, `region_id`) VALUES
+    (0, 'Dummy Province', '0', 0),
 	(1, 'Ilocos Norte', '0128', 1),
 	(2, 'Ilocos Sur', '0129', 1),
 	(3, 'La Union', '0133', 1),
@@ -111,6 +113,7 @@ INSERT INTO `ph_provinces` (`iid`, `iname`, `icode`, `region_id`) VALUES
 	
 --ph_cities
 INSERT INTO `ph_cities` (`iid`, `iname`, `icode`, `province_id`) VALUES
+    (0, 'Dummy City', '0', 0),
 	(2048, 'Adams', '012801', 1),
 	(2049, 'Bacarra', '012802', 1),
 	(2050, 'Badoc', '012803', 1),
@@ -1761,24 +1764,8 @@ INSERT INTO `ph_cities` (`iid`, `iname`, `icode`, `province_id`) VALUES
 
 
 --ph_barangays
--- --------------------------------------------------------
--- Host:                         127.0.0.1
--- Server version:               11.1.2-MariaDB - mariadb.org binary distribution
--- Server OS:                    Win64
--- HeidiSQL Version:             12.3.0.6589
--- --------------------------------------------------------
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET NAMES utf8 */;
-/*!50503 SET NAMES utf8mb4 */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE='+00:00' */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-
--- Dumping data for table dbcbs.ph_barangays: ~42,356 rows (approximately)
 INSERT INTO `ph_barangays` (`iid`, `iname`, `icode`, `city_id`) VALUES
+    (0, 'Dummy Barangay', '0', 0),
 	(17732, ' ', '060406024', 2730),
 	(32291, '50th District (Pob.)', '104210051', 3264),
 	(25229, 'A-et', '082622001', 3011),
@@ -43812,23 +43799,3 @@ INSERT INTO `ph_barangays` (`iid`, `iname`, `icode`, `city_id`) VALUES
 	(34769, 'Zulueta (Bo. 7)', '126306027', 3367),
 	(6511, 'Zulueta District (Pob.)', '034903086', 2304),
 	(38185, 'Zumigui', '148105015', 3501);
-
-
----View
-create view `ph_addresses_vw` AS SELECT 
-b.iid brgy_id,
-b.iname brgy_name,
-b.icode brgy_icode,
-c.iid city_id,
-c.iname city_name,
-c.icode city_icode,
-p.iid province_id,
-p.iname province_name,
-p.icode province_icode,
-r.iid region_id,
-r.iname region_name,
-r.icode region_icode
-FROM ph_barangays b
-JOIN ph_cities c ON (b.city_id=c.iid)
-JOIN ph_provinces p ON (c.province_id=p.iid)
-JOIN ph_regions r ON (p.region_id=r.iid);

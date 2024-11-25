@@ -85,11 +85,16 @@ const AddResidentPage = ({ setSuccess }) => {
 
         if (!validateFormData()) return;
 
+        formData["ProvinceID"] = ProvinceID
+        formData["CityID"] = CityID
+        formData["BarangayID"] = BarangayID
+
         try {
-            await axios.post('http://localhost:8080/add-resident', (formData, ProvinceID, CityID, BarangayID), { withCredentials: true });
+            await axios.post('http://localhost:8080/add-resident', formData, { withCredentials: true });
             sessionStorage.setItem('residentAddedSuccess', 'true');
             navigate('/resident-management');
         } catch (error) {
+            console.error("Failed to save resident:", error);
             setErrorMessage(error.response?.data?.message || 'Failed to save resident');
         } finally {
             setLoading(false);

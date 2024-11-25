@@ -99,7 +99,7 @@ const ViewResidentModal = ({ isOpen, onClose, residentData }) => {
                             </p>
                             <p className="flex items-center text-sm text-gray-600 mb-2">
                                 <FaMapMarkerAlt className="mr-2 text-gray-400" />
-                                <span className="text-gray-600 mr-2">Address:</span> {residentData.Address}
+                                <span className="text-gray-600 mr-2">Address:</span> {`${residentData.Address} ${residentData.Barangay} ${residentData.City} ${residentData.Province}`}
                             </p>
                         </div>
                     )}

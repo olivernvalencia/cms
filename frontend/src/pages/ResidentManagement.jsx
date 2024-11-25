@@ -195,7 +195,12 @@ const ResidentManagement = () => {
                                                     <span className='text-xs text-gray-400'>{resident.Occupation}</span>
                                                 </div>
                                             </td>
-                                            <td className="p-3 text-gray-500">{resident.Address}</td>
+                                            <td className="p-3 text-gray-500">
+                                                <div className='flex flex-col leading-4 text-gray-500'>
+                                                    {`${resident.Address} ${resident.Barangay}`}
+                                                    <span className='text-xs text-gray-400'>{`${resident.City} ${resident.Province}`}</span>
+                                                </div>
+                                            </td>
                                             <td className="p-3 text-gray-500">{resident.HouseholdID}</td>
                                             <td className="p-3 text-gray-500">
                                                 {resident.RegisteredVoter ? (

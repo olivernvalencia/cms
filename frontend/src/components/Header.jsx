@@ -43,8 +43,8 @@ const Header = () => {
             <div className="flex items-center">
                 <img src={cmsLogo} alt="Logo" className="h-12 w-12 mr-3" />
                 <div className='leading-[1px]'>
-                    <h1 className="text-xl font-semibold text-gray-600">Nspire</h1>
-                    <span className='text-xs text-gray-400'>Nspire</span>
+                    <h1 className="text-xl font-semibold text-gray-600">COLO</h1>
+                    <span className='text-xs text-gray-400'>Dinalupihan Bataan</span>
                 </div>
             </div>
             <div className="flex items-center relative">
