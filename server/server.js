@@ -131,7 +131,7 @@ app.post('/login', (req, res) => {
 });
 
 app.get('/registered-voters', verifyUser, (req, res) => {
-    const sql = "SELECT COUNT(*) AS NumberOfRegisteredVoters FROM cbs_resident WHERE RegisteredVoter = 1";
+    const sql = "SELECT COUNT(*) AS NumberOfRegisteredVoters FROM cbs_residents WHERE RegisteredVoter = 1";
 
     db.query(sql, (err, results) => {
         if (err) {
@@ -249,7 +249,7 @@ app.get('/home', verifyUser, (req, res) => {
 });
 
 app.get('/resident-count', (req, res) => {
-    const sql = "SELECT COUNT(*) AS NumberOfResidents FROM cbs_resident";
+    const sql = "SELECT COUNT(*) AS NumberOfResidents FROM cbs_residents";
 
     db.query(sql, (err, result) => {
         if (err) {
@@ -270,7 +270,7 @@ app.get('/population-stats', verifyUser, (req, res) => {
             COUNT(CASE WHEN age >= 60 THEN 1 END) AS seniorCitizens,
             COUNT(CASE WHEN age < 18 THEN 1 END) AS youth,
             COUNT(*) AS totalPopulation
-        FROM cbs_resident
+        FROM cbs_residents
     `;
 
     db.query(sql, (err, results) => {
@@ -299,7 +299,7 @@ app.get('/blotter', (req, res) => {
 // Delete Residents
 app.delete('/residents/:id', (req, res) => {
     const residentId = req.params.id;
-    const query = 'DELETE FROM cbs_resident WHERE ResidentID = ?';
+    const query = 'DELETE FROM cbs_residents WHERE ResidentID = ?';
 
     db.query(query, [residentId], (error, results) => {
         if (error) {
@@ -316,7 +316,7 @@ app.delete('/residents/:id', (req, res) => {
 });
 
 app.get('/residents/count', (req, res) => {
-    const query = 'SELECT COUNT(*) AS count FROM cbs_resident';
+    const query = 'SELECT COUNT(*) AS count FROM cbs_residents';
 
     db.query(query, (err, result) => {
         if (err) {
