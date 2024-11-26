@@ -95,7 +95,10 @@ CREATE TABLE `cbs_users` (
 	`role` VARCHAR(255) NOT NULL COLLATE 'utf8mb4_general_ci',
 	PRIMARY KEY (`id`) USING BTREE,
 	INDEX `FK1_brgyid` (`barangay_id`) USING BTREE,
-	CONSTRAINT `FK1_brgyid` FOREIGN KEY (`barangay_id`) REFERENCES `ph_barangays` (`iid`) ON UPDATE NO ACTION ON DELETE NO ACTION
+	CONSTRAINT `FK1_brgyid` FOREIGN KEY (`barangay_id`) REFERENCES `ph_barangays` (`iid`) ON UPDATE NO ACTION ON DELETE NO ACTION,
+	CONSTRAINT `FK2_cityid` FOREIGN KEY (`city_id`) REFERENCES `ph_cities` (`iid`) ON UPDATE NO ACTION ON DELETE NO ACTION,
+	CONSTRAINT `FK3_provid` FOREIGN KEY (`province_id`) REFERENCES `ph_provinces` (`iid`) ON UPDATE NO ACTION ON DELETE NO ACTION,
+	CONSTRAINT `FK4_lguid` FOREIGN KEY (`lgu_type_id`) REFERENCES `lgu_types` (`iid`) ON UPDATE NO ACTION ON DELETE NO ACTION
 )
 COLLATE='utf8mb4_general_ci'
 ENGINE=InnoDB
