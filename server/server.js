@@ -285,7 +285,7 @@ app.get('/population-stats', verifyUser, (req, res) => {
 });
 
 app.get('/blotter', (req, res) => {
-    const sql = "SELECT * FROM cbs_blotter ORDER BY incident_date DESC";
+    const sql = "SELECT * FROM cbs_blotters ORDER BY incident_date DESC";
 
     db.query(sql, (err, results) => {
         if (err) {
