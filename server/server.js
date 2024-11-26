@@ -154,8 +154,12 @@ app.get('/residents', verifyUser, (req, res) => {
         (select iname from ph_barangays where iid = Barangay_ID) Barangay,
         (select iname from ph_cities where iid = City_ID) City,
         (select iname from ph_provinces where iid = Province_ID) Province
-        from cbs_resident
+        from cbs_residents
     `;
+
+    //const sql = `
+    //    CALL GetAllResidents(5628)
+    //`;
 
     db.query(sql, (err, results) => {
         if (err) {
@@ -179,7 +183,7 @@ app.post('/add-resident', async (req, res) => {
 
     try {
         const query = `
-            INSERT INTO cbs_resident 
+            INSERT INTO cbs_residents 
             (FirstName, LastName, MiddleName, Age, birthday, Gender, Address, Province_ID, City_ID, Barangay_ID, ContactNumber, Email, CivilStatus, Occupation, HouseholdID, JuanBataanID, RegistrationDate, Status, RegisteredVoter, VoterIDNumber, VotingPrecinct)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
@@ -211,11 +215,11 @@ app.put('/update-resident/:id', async (req, res) => {
 
     try {
         const query = `
-            UPDATE cbs_resident
+            UPDATE cbs_residents
             SET FirstName = ?, LastName = ?, MiddleName = ?, Age = ?, birthday = ?, Gender = ?,
                 Address = ?, Province_ID = ?, City_ID = ?, Barangay_ID = ?, ContactNumber = ?, Email = ?, CivilStatus = ?, Occupation = ?, 
                 HouseholdID = ?, JuanBataanID = ?, RegistrationDate = ?, Status = ?, 
-                RegisteredVoter = ?, VoterIDNumber = ?, VotingPrecinct = ?
+                RegisteredVoter = ?, VoterIDNumber = ?, VotingPrecinct = ?, Last_Updated = now()
             WHERE ResidentID = ?
         `;
         const values = [
