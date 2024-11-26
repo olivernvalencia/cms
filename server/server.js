@@ -110,7 +110,8 @@ app.post('/login', (req, res) => {
                 if (result) {
                     const user = data[0].users;
                     const role = data[0].role;
-                    const token = jwt.sign({ users: user, role: role }, "jwt-secret-key", { expiresIn: '1d' });
+                    const BrgyID = data[0].barangay_id;
+                    const token = jwt.sign({ users: user, role: role, BrgyID: BrgyID}, "jwt-secret-key", { expiresIn: '1d' });
 
                     console.log('Generated Token:', token);
                     res.cookie('token', token, {
@@ -146,20 +147,20 @@ app.get('/registered-voters', verifyUser, (req, res) => {
 
 // Endpoint to get resident details
 app.get('/residents', verifyUser, (req, res) => {
-    const sql = `
-        select ResidentID,FirstName,LastName,MiddleName,Age,
-        birthday,Gender,Address,ContactNumber,Email,CivilStatus,Occupation,
-        HouseholdID,JuanBataanID,RegistrationDate,Status,RegisteredVoter,VoterIDNumber,
-        VotingPrecinct,
-        (select iname from ph_barangays where iid = Barangay_ID) Barangay,
-        (select iname from ph_cities where iid = City_ID) City,
-        (select iname from ph_provinces where iid = Province_ID) Province
-        from cbs_residents
-    `;
-
     //const sql = `
-    //    CALL GetAllResidents(5628)
+    //    select ResidentID,FirstName,LastName,MiddleName,Age,
+    //    birthday,Gender,Address,ContactNumber,Email,CivilStatus,Occupation,
+    //    HouseholdID,JuanBataanID,RegistrationDate,Status,RegisteredVoter,VoterIDNumber,
+    //    VotingPrecinct,
+    //    (select iname from ph_barangays where iid = Barangay_ID) Barangay,
+    //    (select iname from ph_cities where iid = City_ID) City,
+    //    (select iname from ph_provinces where iid = Province_ID) Province
+    //   from cbs_residents
     //`;
+
+    const sql = `
+        CALL GetAllResidents(5628)
+    `;
 
     db.query(sql, (err, results) => {
         if (err) {

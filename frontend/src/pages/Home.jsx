@@ -11,6 +11,7 @@ import BlotterList from '../components/BlotterList';
 
 const Home = () => {
     const [user, setUser] = useState(null);
+    const [BrgyID, setBrgyID] = useState(null);
     const [error, setError] = useState('');
     const [chartData, setChartData] = useState({
         datasets: [{
@@ -45,6 +46,7 @@ const Home = () => {
                 const response = await axios.get('http://localhost:8080/home', { withCredentials: true });
                 if (response.data.Status === 'Success') {
                     setUser(response.data.user);
+                    setBrgyID(response.data.BrgyID);
                 } else {
                     setError(response.data.Error || 'Not authorized');
                     navigate('/login');

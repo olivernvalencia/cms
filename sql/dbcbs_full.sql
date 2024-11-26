@@ -87,13 +87,21 @@ INSERT INTO `cbs_residents` (`ResidentID`, `FirstName`, `LastName`, `MiddleName`
 
 -- Dumping structure for table dbcbs.cbs_users
 DROP TABLE IF EXISTS `cbs_users`;
-CREATE TABLE IF NOT EXISTS `cbs_users` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `users` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `role` varchar(255) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+CREATE TABLE `cbs_users` (
+	`id` INT(11) NOT NULL AUTO_INCREMENT,
+	`barangay_id` INT(11) NOT NULL DEFAULT '0',
+	`users` VARCHAR(255) NOT NULL COLLATE 'utf8mb4_general_ci',
+	`password` VARCHAR(255) NOT NULL COLLATE 'utf8mb4_general_ci',
+	`role` VARCHAR(255) NOT NULL COLLATE 'utf8mb4_general_ci',
+	PRIMARY KEY (`id`) USING BTREE,
+	INDEX `FK1_brgyid` (`barangay_id`) USING BTREE,
+	CONSTRAINT `FK1_brgyid` FOREIGN KEY (`barangay_id`) REFERENCES `ph_barangays` (`iid`) ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+COLLATE='utf8mb4_general_ci'
+ENGINE=InnoDB
+AUTO_INCREMENT=16
+;
+
 
 -- Dumping data for table dbcbs.cbs_users: ~15 rows (approximately)
 INSERT INTO `cbs_users` (`id`, `users`, `password`, `role`) VALUES

@@ -58,7 +58,7 @@ const ResidentManagement = () => {
     const fetchResidents = async () => {
         try {
             const response = await axios.get('http://localhost:8080/residents', { withCredentials: true });
-            setResidents(response.data);
+            setResidents(response.data[0]);
 
         } catch (error) {
             console.error("Error fetching residents data:", error);

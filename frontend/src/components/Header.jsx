@@ -8,6 +8,7 @@ const Header = () => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [user, setUser] = useState(null);
     const [role, setRole] = useState(null);
+    const [BrgyID, setBrgyID] = useState(null);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
@@ -21,6 +22,7 @@ const Header = () => {
                 if (res.data.Status === 'Success') {
                     setUser(res.data.user);
                     setRole(res.data.role);
+                    setBrgyID(res.data.BrgyID);
                 } else {
                     setError(res.data.Error || 'Not authorized');
                 }
