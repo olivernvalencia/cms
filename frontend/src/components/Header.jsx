@@ -9,6 +9,7 @@ const Header = () => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [user, setUser] = useState(null);
     const [role, setRole] = useState(null);
+    const [profileImage, setprofileImage] = useState("");
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
@@ -22,6 +23,7 @@ const Header = () => {
                 if (res.data.Status === 'Success') {
                     setUser(res.data.user);
                     setRole(res.data.role);
+                    setprofileImage(res.data.ProfileImage);
                 } else {
                     setError(res.data.Error || 'Not authorized');
                 }
@@ -55,7 +57,7 @@ const Header = () => {
                     aria-haspopup="true"
                     aria-expanded={isDropdownOpen}
                 >
-                    <img src={cmsLogo} alt="Logo" className="h-10 w-10 object-contain mr-3" />
+                    <img src={profileImage} alt="Profile Picture" className="h-12 w-12 mr-3" />
                     <div className='flex flex-col items-start'>
                         {user && (
                             <>

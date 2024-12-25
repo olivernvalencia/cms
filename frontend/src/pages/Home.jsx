@@ -13,6 +13,7 @@ import cfg from '../../../server/controllers/domainController.js';
 
 const Home = () => {
     const [user, setUser] = useState(null);
+    const [profileImage, setprofileImage] = useState("");
     const [error, setError] = useState("");
     const [chartData, setChartData] = useState({
         datasets: [
@@ -53,6 +54,7 @@ const Home = () => {
                 });
                 if (response.data.Status === "Success") {
                     setUser(response.data.user);
+                    setprofileImage(response.data.ProfileImage);
                 } else {
                     setError(response.data.Error || "Not authorized");
                     navigate("/login");

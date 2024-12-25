@@ -25,13 +25,12 @@ export const login = (req, res) => {
 
     db.query(sql, [users], (err, data) => {
         if (err) return res.status(500).json({ Error: "Database error" });
-
         if (data.length > 0) {
             bcrypt.compare(password.toString(), data[0].password, (err, result) => {
                 if (err) return res.status(500).json({ Error: "Password Compare Error" });
                 if (result) {
                     const token = jwt.sign(
-                        { user: data[0].user, user_id: data[0].id, role: data[0].role, barangay_id: data[0].barangay_id },
+                        { user: data[0].user, user_id: data[0].id, role: data[0].role, barangay_id: data[0].barangay_id, profile_image: data[0].profile_image },
                         "jwt-secret-key",
                         { expiresIn: '1d' }
                     );
@@ -42,7 +41,7 @@ export const login = (req, res) => {
                         sameSite: 'Lax',
                         path: '/',
                     });
-                    return res.json({ Status: "Success", Id: data[0].barangay_id });
+                    return res.json({ Status: "Success", Id: data[0].barangay_id, ProfileImage: data[0].profile_image });
                 }
                 return res.json({ Error: "Invalid password" });
             });
@@ -63,7 +62,8 @@ export const getHome = (req, res) => {
         user: req.user.user,
         user_id: req.user.user_id,
         role: req.user.role,
-        barangay_id: req.user.barangay_id
+        barangay_id: req.user.barangay_id,
+        ProfileImage: req.user.profile_image
     });
 };
 
