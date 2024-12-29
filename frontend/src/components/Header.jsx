@@ -10,6 +10,10 @@ const Header = () => {
     const [user, setUser] = useState(null);
     const [role, setRole] = useState(null);
     const [profileImage, setprofileImage] = useState("");
+    const [barangayLogo, setbarangayLogo] = useState("");
+    const [Barangay, setBarangay] = useState("");
+    const [City, setCity] = useState("");
+    const [Province, setProvince] = useState("");
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
@@ -20,10 +24,15 @@ const Header = () => {
     useEffect(() => {
         axios.get(`http://${cfg.domainname}:8080/home`, { withCredentials: true })
             .then(res => {
+                console.log(res.data)
                 if (res.data.Status === 'Success') {
                     setUser(res.data.user);
                     setRole(res.data.role);
                     setprofileImage(res.data.ProfileImage);
+                    setbarangayLogo(res.data.BarangayLogo);
+                    setBarangay(res.data.Barangay);
+                    setCity(res.data.City);
+                    setProvince(res.data.Province);
                 } else {
                     setError(res.data.Error || 'Not authorized');
                 }
@@ -44,10 +53,10 @@ const Header = () => {
     return (
         <header className="bg-white shadow-md p-4 flex justify-between items-center">
             <div className="flex items-center">
-                <img src={cmsLogo} alt="Logo" className="h-12 w-12 mr-3" />
+                <img src={barangayLogo} alt="Logo" className="h-12 w-12 mr-3" />
                 <div className='leading-[1px]'>
-                    <h1 className="text-xl font-semibold text-gray-600">Nspire</h1>
-                    <span className='text-xs text-gray-400'>Nspire</span>
+                    <h1 className="text-xl font-semibold text-gray-600">{Barangay}</h1>
+                    <span className='text-xs text-gray-400'>{City}, {Province}</span>
                 </div>
             </div>
             <div className="flex items-center relative">

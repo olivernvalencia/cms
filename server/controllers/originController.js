@@ -1,4 +1,4 @@
-import cfgData from './config.json' with { type: "json" };
+import cfgData from '../config/config.json' with { type: "json" };
 
 const cfg = {
   ...cfgData,

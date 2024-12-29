@@ -8,7 +8,7 @@ import blotterRoutes from './routes/blotter.js';
 import locationRoutes from './routes/location.js'
 import certificateRoutes from './routes/certificate.js'
 import brgyOfficialsRoutes  from './routes/officials.js';
-import cfg from './config/config.js';
+import cfg from './controllers/originController.js'
 
 const app = express();
 

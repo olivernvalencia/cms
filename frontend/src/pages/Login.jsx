@@ -19,7 +19,6 @@ const Login = () => {
 
     const navigate = useNavigate();
     const { setBarangayId } = useAuth();
-    const [ profileImage, setprofileImage ] = useState("");
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -36,7 +35,6 @@ const Login = () => {
                 if (res.data.Status === 'Success') {
                     setValues({ users: '', password: '' });
                     setBarangayId(res.data.Id);
-                    setprofileImage(res.data.ProfileImage);
                     console.log('barangay id:', res.data.Id);
                     navigate('/home');
                 } else {

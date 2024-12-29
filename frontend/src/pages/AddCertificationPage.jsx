@@ -4,7 +4,7 @@ import Sidebar from "../components/Sidebar";
 import Breadcrumbs from "../components/Breadcrumbs";
 import CertificationForm from '../components/CertificationForm';
 import Loader from '../components/Loader';
-import cfg from '../../../server/config/config.js';
+import cfg from '../../../server/controllers/domainController.js';
 
 
 const AddCertificationPage = () => {

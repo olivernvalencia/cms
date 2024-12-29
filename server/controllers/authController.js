@@ -21,7 +21,7 @@ export const register = (req, res) => {
 
 export const login = (req, res) => {
     const { users, password } = req.body;
-    const sql = "SELECT * FROM cbs_users WHERE user = ?";
+    const sql =  "SELECT u.*, av.* FROM cbs_users u JOIN ph_addresses_vw av ON (u.barangay_id=av.brgy_id) WHERE USER = ?";
 
     db.query(sql, [users], (err, data) => {
         if (err) return res.status(500).json({ Error: "Database error" });
@@ -30,7 +30,9 @@ export const login = (req, res) => {
                 if (err) return res.status(500).json({ Error: "Password Compare Error" });
                 if (result) {
                     const token = jwt.sign(
-                        { user: data[0].user, user_id: data[0].id, role: data[0].role, barangay_id: data[0].barangay_id, profile_image: data[0].profile_image },
+                        { user: data[0].user, user_id: data[0].id, role: data[0].role, barangay_id: data[0].barangay_id, 
+                            profile_image: data[0].profile_image, brgy_logo: data[0].brgy_logo, brgy_name: data[0].brgy_name,
+                            city_name: data[0].city_name, province_name: data[0].province_name },
                         "jwt-secret-key",
                         { expiresIn: '1d' }
                     );
@@ -41,7 +43,7 @@ export const login = (req, res) => {
                         sameSite: 'Lax',
                         path: '/',
                     });
-                    return res.json({ Status: "Success", Id: data[0].barangay_id, ProfileImage: data[0].profile_image });
+                    return res.json({ Status: "Success", Id: data[0].barangay_id });
                 }
                 return res.json({ Error: "Invalid password" });
             });
@@ -63,7 +65,11 @@ export const getHome = (req, res) => {
         user_id: req.user.user_id,
         role: req.user.role,
         barangay_id: req.user.barangay_id,
-        ProfileImage: req.user.profile_image
+        ProfileImage: req.user.profile_image,
+        BarangayLogo: req.user.brgy_logo,
+        Barangay: req.user.brgy_name,
+        City: req.user.city_name,
+        Province: req.user.province_name,
     });
 };
 
