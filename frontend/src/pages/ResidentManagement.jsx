@@ -198,7 +198,7 @@ const ResidentManagement = () => {
                                         <tr key={resident.resident_id} className="border-b hover:bg-gray-100 even:bg-gray-50">
                                             <td className="p-3 flex items-center gap-2">
                                                 <div className="bg-gray-200 rounded-full">
-                                                    {resident.image ? (
+                                                    {resident.profile_image ? (
                                                         <img
                                                             src={resident.profile_image}
                                                             alt="Resident"

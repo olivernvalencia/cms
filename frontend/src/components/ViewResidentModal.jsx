@@ -17,7 +17,15 @@ const ViewResidentModal = ({ isOpen, onClose, residentData }) => {
                 {/* Resident Header */}
                 <div className="flex items-center mb-4">
                     <div className="bg-gray-200 rounded-full h-16 w-16 flex items-center justify-center mr-4">
-                        <RxAvatar className='w-16 h-16 text-gray-400' />
+                        {residentData.profile_image ? (
+                           <img
+                                src={residentData.profile_image}
+                                alt="Resident"
+                                className="rounded-full"
+                            />
+                         ) : (
+                               <RxAvatar className="w-8 h-8 text-gray-400" />
+                         )}
                     </div>
                     <div>
                         <h2 className="text-xl font-semibold text-gray-500">
