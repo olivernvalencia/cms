@@ -1,6 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 
-
 const encryptData = async (data) => {
     try {
         const encoder = new TextEncoder();
@@ -13,9 +12,8 @@ const encryptData = async (data) => {
         const encrypted = await crypto.subtle.encrypt(
             { name: 'AES-GCM', iv: iv },
             key,
-            encoder.encode(data)
+            encoder.encode(String(data))  // Ensure data is string
         );
-
 
         const exportedKey = await crypto.subtle.exportKey('raw', key);
         return {
@@ -39,7 +37,6 @@ const decryptData = async (encryptedObj) => {
         const ivBuffer = new Uint8Array(atob(iv).split('').map(char => char.charCodeAt(0)));
         const keyBuffer = new Uint8Array(atob(key).split('').map(char => char.charCodeAt(0)));
 
-        // Import the key
         const importedKey = await crypto.subtle.importKey(
             'raw',
             keyBuffer,
@@ -48,7 +45,6 @@ const decryptData = async (encryptedObj) => {
             ['decrypt']
         );
 
-        // Decrypt the data
         const decrypted = await crypto.subtle.decrypt(
             { name: 'AES-GCM', iv: ivBuffer },
             importedKey,
@@ -66,16 +62,28 @@ const decryptData = async (encryptedObj) => {
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    const [barangayId, setBarangayId] = useState(null);
+    const [barangayId, setBarangayId] = useState(() => {
+        // Try to get initial value from localStorage
+        const stored = localStorage.getItem('barangayId');
+        if (stored) {
+            try {
+                return JSON.parse(stored)._id || null;
+            } catch (e) {
+                return null;
+            }
+        }
+        return null;
+    });
 
+    // Load encrypted data on mount
     useEffect(() => {
         const loadEncryptedData = async () => {
             const storedData = localStorage.getItem('barangayId');
             if (storedData) {
                 try {
-                    const decryptedId = await decryptData(JSON.parse(storedData));
-                    if (decryptedId) {
-                        setBarangayId(decryptedId);
+                    const parsedData = JSON.parse(storedData);
+                    if (parsedData._id) {
+                        setBarangayId(parsedData._id);
                     }
                 } catch (error) {
                     console.error('Error loading barangay ID:', error);
@@ -86,31 +94,66 @@ export const AuthProvider = ({ children }) => {
         loadEncryptedData();
     }, []);
 
-    // Encrypt and store data when barangayId changes
+    // Store data whenever barangayId changes
     useEffect(() => {
-        const storeEncryptedData = async () => {
+        const saveData = async () => {
             if (barangayId) {
                 try {
+                    // Store both encrypted and raw versions
                     const encryptedData = await encryptData(barangayId);
-                    if (encryptedData) {
-                        localStorage.setItem('barangayId', JSON.stringify(encryptedData));
-                    }
+                    const dataToStore = {
+                        ...encryptedData,
+                        _id: barangayId  // Keep raw ID for immediate access
+                    };
+                    localStorage.setItem('barangayId', JSON.stringify(dataToStore));
                 } catch (error) {
-                    console.error('Error storing barangay ID:', error);
+                    console.error('Error saving barangay ID:', error);
                 }
-            } else {
-                localStorage.removeItem('barangayId');
             }
         };
 
-        storeEncryptedData();
+        if (barangayId) {
+            saveData();
+        }
     }, [barangayId]);
 
+    const handleSetBarangayId = (id) => {
+        if (id) {
+            setBarangayId(id);
+            // Also store immediately in localStorage as raw value
+            const currentData = localStorage.getItem('barangayId');
+            let dataToUpdate = { _id: id };
+            if (currentData) {
+                try {
+                    dataToUpdate = { ...JSON.parse(currentData), _id: id };
+                } catch (e) {
+                    // If parse fails, just use the new data
+                }
+            }
+            localStorage.setItem('barangayId', JSON.stringify(dataToUpdate));
+        }
+    };
+
+    const clearBarangayId = () => {
+        setBarangayId(null);
+        localStorage.removeItem('barangayId');
+    };
+
     return (
-        <AuthContext.Provider value={{ barangayId, setBarangayId }}>
+        <AuthContext.Provider value={{
+            barangayId,
+            setBarangayId: handleSetBarangayId,
+            clearBarangayId
+        }}>
             {children}
         </AuthContext.Provider>
     );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+    const context = useContext(AuthContext);
+    if (!context) {
+        throw new Error('useAuth must be used within an AuthProvider');
+    }
+    return context;
+};

@@ -1,4 +1,6 @@
 import express from 'express';
+import upload from '../middleware/multerMiddleware.js'; // Import multer middleware (ES Module)
+import { verifyUser } from '../middleware/authMiddleware.js';
 import {
     getAllResidents,
     addResident,
@@ -6,12 +8,13 @@ import {
     deleteResident,
     getResidentCount
 } from '../controllers/residentController.js';
-import { verifyUser } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
+// Route to add a resident with file upload
+router.post('/add', verifyUser, upload.single('Profile_Image'), addResident); // Use multer middleware for 'Profile_Image'
+
 router.get('/:id', verifyUser, getAllResidents);
-router.post('/add', verifyUser, addResident);
 router.put('/update/:id', verifyUser, updateResident);
 router.delete('/:id', verifyUser, deleteResident);
 router.get('/count/:id', verifyUser, getResidentCount);

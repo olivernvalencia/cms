@@ -97,6 +97,7 @@ const Home = () => {
     }, []);
 
     if (error) return <div>{error}</div>;
+    console.log(barangayId);
 
     return (
         <div className="flex flex-col h-screen">

@@ -38,6 +38,9 @@ export const addResident = async (req, res) => {
             IsJuanBataanMember, JuanBataanID,
         } = req.body;
 
+        // Get the profile image filename
+        const profileImage = req.file ? req.file.filename : null;  // Multer will store the file with a unique name
+        console.log("file", req.file);
 
         const sql = `CALL AddResident(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
@@ -67,6 +70,7 @@ export const addResident = async (req, res) => {
             VoterIDNumber || null,
             IsJuanBataanMember ? 1 : 0,
             JuanBataanID || null,
+            profileImage,  // This is the file name you want to store in the DB
         ];
 
         const result = await db.query(sql, values);

@@ -19,7 +19,7 @@ const AddResidentPage = ({ setSuccess }) => {
         IsLocalResident: false, ResidentType: '', ContactNumber: '', Email: '',
         CivilStatus: '', Occupation: '', IsHouseholdHead: false, HouseholdID: '',
         IsRegisteredVoter: false, VoterIDNumber: '', IsJuanBataanMember: false,
-        JuanBataanID: '',
+        JuanBataanID: '', Profile_Image: '',
     });
     const [errorMessage, setErrorMessage] = useState('');
     const [loading, setLoading] = useState(false);
@@ -294,6 +294,16 @@ const AddResidentPage = ({ setSuccess }) => {
         return true;
     };
 
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setFormData(prevData => ({
+                ...prevData,
+                Profile_Image: file  // Store the actual file object
+            }));
+        }
+    };
+
     const handleAddResident = async (e) => {
         e.preventDefault();
         setErrorMessage('');
@@ -301,28 +311,39 @@ const AddResidentPage = ({ setSuccess }) => {
 
         if (!validateFormData()) return;
 
-        const formDataToSubmit = {
-            ...formData,
-            IsLocalResident: formData.IsLocalResident ? 1 : 0,
-            IsHouseholdHead: formData.IsHouseholdHead ? 1 : 0,
-            IsRegisteredVoter: formData.IsRegisteredVoter ? 1 : 0,
-            IsJuanBataanMember: formData.IsJuanBataanMember ? 1 : 0,
-            MiddleName: formData.MiddleName || null,
-            Suffix: formData.Suffix || null,
-            BirthPlace: formData.BirthPlace || null,
-            Occupation: formData.Occupation || null,
-            CivilStatus: formData.CivilStatus || null,
-            ResidentType: formData.ResidentType || null,
-            Email: formData.Email || null,
-            HouseholdID: formData.HouseholdID || null,
-            VoterIDNumber: formData.VoterIDNumber || null,
-            JuanBataanID: formData.JuanBataanID || null,
+        // Create FormData object
+        const formDataToSubmit = new FormData();
 
-            birthday: formData.birthday ? new Date(formData.birthday).toISOString().split('T')[0] : null
-        };
+        // Append file if it exists
+        const fileInput = document.querySelector('input[type="file"]');
+        if (fileInput && fileInput.files[0]) {
+            formDataToSubmit.append('Profile_Image', fileInput.files[0]);
+        }
+
+        // Append all other form fields
+        Object.keys(formData).forEach(key => {
+            if (key !== 'Profile_Image') {  // Skip the file input
+                if (key === 'birthday' && formData[key]) {
+                    formDataToSubmit.append(key, new Date(formData[key]).toISOString().split('T')[0]);
+                } else if (typeof formData[key] === 'boolean') {
+                    formDataToSubmit.append(key, formData[key] ? '1' : '0');
+                } else if (formData[key] !== null && formData[key] !== undefined) {
+                    formDataToSubmit.append(key, formData[key]);
+                }
+            }
+        });
 
         try {
-            await axios.post(`http://${cfg.domainname}:8080/residents/add`, formDataToSubmit, { withCredentials: true });
+            const response = await axios.post(
+                `http://${cfg.domainname}:8080/residents/add`,
+                formDataToSubmit,
+                {
+                    withCredentials: true,
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                }
+            );
             sessionStorage.setItem('residentAddedSuccess', 'true');
             navigate('/resident-management');
         } catch (error) {
@@ -354,6 +375,13 @@ const AddResidentPage = ({ setSuccess }) => {
                                         <h2 className="text-sm font-bold text-gray-500">Personal Details</h2>
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                        <input
+                                            type="file"
+                                            name="Profile_Image"
+                                            onChange={handleFileChange}
+                                            accept="image/jpeg,image/png"
+                                            className="border text-sm border-gray-300 p-2 w-full text-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        />
                                         <div>
                                             <label className="block mb-2 text-sm font-medium text-gray-500">First Name</label>
                                             <input type="text" name="FirstName" value={formData.FirstName} onChange={handleChange} placeholder="First Name" required className="border text-sm border-gray-300 p-2 w-full text-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />

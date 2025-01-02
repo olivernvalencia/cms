@@ -198,14 +198,25 @@ const ResidentManagement = () => {
                                         <tr key={resident.resident_id} className="border-b hover:bg-gray-100 even:bg-gray-50">
                                             <td className="p-3 flex items-center gap-2">
                                                 <div className="bg-gray-200 rounded-full">
-                                                    {resident.image ? (
-                                                        <img
-                                                            src={resident.profile_image}
-                                                            alt="Resident"
-                                                            className="w-8 h-8 rounded-full object-cover"
+                                                    {resident.profile_image ? (
+                                                        <div
+                                                            className="w-10 h-10 rounded-full"
+                                                            style={{
+                                                                backgroundImage: `url(${resident.profile_image})`,
+                                                                backgroundSize: 'cover',
+                                                                backgroundPosition: 'center',
+                                                                backgroundRepeat: 'no-repeat',
+                                                                height: '2.5rem',
+                                                                width: '2.5rem',
+                                                                borderRadius: '50%',
+                                                                overflow: 'hidden',
+                                                            }}
+                                                            role="img"
+                                                            aria-label="Resident"
                                                         />
+
                                                     ) : (
-                                                        <RxAvatar className="w-8 h-8 text-gray-400" />
+                                                        <RxAvatar className="w-10 h-10 text-gray-400" />
                                                     )}
                                                 </div>
                                                 <div className='flex flex-col leading-4 text-gray-500'>
