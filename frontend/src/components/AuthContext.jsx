@@ -1,6 +1,31 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 
+// Simple fallback encryption (FOR DEVELOPMENT ONLY)
+const fallbackEncrypt = (data) => {
+    // Basic Base64 encoding - NOT secure, only for development
+    return {
+        encrypted: btoa(String(data)),
+        iv: 'dummy-iv',
+        key: 'dummy-key',
+        isFallback: true
+    };
+};
+
+// Simple fallback decryption (FOR DEVELOPMENT ONLY)
+const fallbackDecrypt = (encryptedObj) => {
+    if (!encryptedObj) return null;
+    if (encryptedObj.isFallback) {
+        return atob(encryptedObj.encrypted);
+    }
+    return null;
+};
+
 const encryptData = async (data) => {
+    if (!crypto?.subtle) {
+        console.warn('Web Crypto API not available - using fallback encryption (Development Only!)');
+        return fallbackEncrypt(data);
+    }
+
     try {
         const encoder = new TextEncoder();
         const key = await crypto.subtle.generateKey(
@@ -12,23 +37,35 @@ const encryptData = async (data) => {
         const encrypted = await crypto.subtle.encrypt(
             { name: 'AES-GCM', iv: iv },
             key,
-            encoder.encode(String(data))  // Ensure data is string
+            encoder.encode(String(data))
         );
 
         const exportedKey = await crypto.subtle.exportKey('raw', key);
         return {
-            encrypted: btoa(String.fromCharCode.apply(null, new Uint8Array(encrypted))),
-            iv: btoa(String.fromCharCode.apply(null, iv)),
-            key: btoa(String.fromCharCode.apply(null, new Uint8Array(exportedKey)))
+            encrypted: btoa(String.fromCharCode(...new Uint8Array(encrypted))),
+            iv: btoa(String.fromCharCode(...iv)),
+            key: btoa(String.fromCharCode(...new Uint8Array(exportedKey))),
+            isFallback: false
         };
     } catch (error) {
         console.error('Encryption error:', error);
-        return null;
+        console.warn('Falling back to basic encryption (Development Only!)');
+        return fallbackEncrypt(data);
     }
 };
 
 const decryptData = async (encryptedObj) => {
+    if (!crypto?.subtle) {
+        console.warn('Web Crypto API not available - using fallback decryption (Development Only!)');
+        return fallbackDecrypt(encryptedObj);
+    }
+
     if (!encryptedObj) return null;
+
+    // Check if this was encrypted with fallback
+    if (encryptedObj.isFallback) {
+        return fallbackDecrypt(encryptedObj);
+    }
 
     try {
         const { encrypted, iv, key } = encryptedObj;
@@ -55,35 +92,24 @@ const decryptData = async (encryptedObj) => {
         return decoder.decode(decrypted);
     } catch (error) {
         console.error('Decryption error:', error);
-        return null;
+        return fallbackDecrypt(encryptedObj);
     }
 };
+
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    const [barangayId, setBarangayId] = useState(() => {
-        // Try to get initial value from localStorage
-        const stored = localStorage.getItem('barangayId');
-        if (stored) {
-            try {
-                return JSON.parse(stored)._id || null;
-            } catch (e) {
-                return null;
-            }
-        }
-        return null;
-    });
+    const [barangayId, setBarangayId] = useState(null);
 
-    // Load encrypted data on mount
     useEffect(() => {
         const loadEncryptedData = async () => {
             const storedData = localStorage.getItem('barangayId');
             if (storedData) {
                 try {
-                    const parsedData = JSON.parse(storedData);
-                    if (parsedData._id) {
-                        setBarangayId(parsedData._id);
+                    const decryptedId = await decryptData(JSON.parse(storedData));
+                    if (decryptedId) {
+                        setBarangayId(decryptedId);
                     }
                 } catch (error) {
                     console.error('Error loading barangay ID:', error);
@@ -94,66 +120,31 @@ export const AuthProvider = ({ children }) => {
         loadEncryptedData();
     }, []);
 
-    // Store data whenever barangayId changes
+    // Encrypt and store data when barangayId changes
     useEffect(() => {
-        const saveData = async () => {
+        const storeEncryptedData = async () => {
             if (barangayId) {
                 try {
-                    // Store both encrypted and raw versions
                     const encryptedData = await encryptData(barangayId);
-                    const dataToStore = {
-                        ...encryptedData,
-                        _id: barangayId  // Keep raw ID for immediate access
-                    };
-                    localStorage.setItem('barangayId', JSON.stringify(dataToStore));
+                    if (encryptedData) {
+                        localStorage.setItem('barangayId', JSON.stringify(encryptedData));
+                    }
                 } catch (error) {
-                    console.error('Error saving barangay ID:', error);
+                    console.error('Error storing barangay ID:', error);
                 }
+            } else {
+                localStorage.removeItem('barangayId');
             }
         };
 
-        if (barangayId) {
-            saveData();
-        }
+        storeEncryptedData();
     }, [barangayId]);
 
-    const handleSetBarangayId = (id) => {
-        if (id) {
-            setBarangayId(id);
-            // Also store immediately in localStorage as raw value
-            const currentData = localStorage.getItem('barangayId');
-            let dataToUpdate = { _id: id };
-            if (currentData) {
-                try {
-                    dataToUpdate = { ...JSON.parse(currentData), _id: id };
-                } catch (e) {
-                    // If parse fails, just use the new data
-                }
-            }
-            localStorage.setItem('barangayId', JSON.stringify(dataToUpdate));
-        }
-    };
-
-    const clearBarangayId = () => {
-        setBarangayId(null);
-        localStorage.removeItem('barangayId');
-    };
-
     return (
-        <AuthContext.Provider value={{
-            barangayId,
-            setBarangayId: handleSetBarangayId,
-            clearBarangayId
-        }}>
+        <AuthContext.Provider value={{ barangayId, setBarangayId }}>
             {children}
         </AuthContext.Provider>
     );
 };
 
-export const useAuth = () => {
-    const context = useContext(AuthContext);
-    if (!context) {
-        throw new Error('useAuth must be used within an AuthProvider');
-    }
-    return context;
-};
+export const useAuth = () => useContext(AuthContext);

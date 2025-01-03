@@ -50,6 +50,7 @@ const IncidentRepotViewPage = () => {
                 withCredentials: true,
             });
             setBlotterDetails(response.data[0]);
+            console.log(response.data[0]);
         } catch (error) {
             setError("Failed to fetch data. Please try again later.");
             console.error(error);
@@ -74,12 +75,11 @@ const IncidentRepotViewPage = () => {
         }
     };
 
-
     if (!blotterDetails) return <p>Loading...</p>;
 
     const defendants = JSON.parse(blotterDetails?.defendants || "[]");
-    const addresses = JSON.parse(blotterDetails?.addresses || "[]");
-    const contacts = JSON.parse(blotterDetails?.contacts || "[]");
+    const addresses = JSON.parse(blotterDetails?.def_addresses || "[]");
+    const contacts = JSON.parse(blotterDetails?.def_contacts || "[]");
 
     return (
         <div className="flex flex-col h-screen">
@@ -278,8 +278,13 @@ export default IncidentRepotViewPage;
 function Modal({ isOpen, onClose }) {
 
     const { barangayId } = useAuth();
+
     const [barangayOfficials, setBarangayOfficials] = useState(null);
+    const [hearingStatuses, setHearingStatuses] = useState(null);
+
     const [selectedBarangayOfficial, setSelectedBarangayOfficial] = useState("");
+    const [selectedHearingStatus, setSelectedHearingStatus] = useState("");
+
     const [error, setError] = useState("");
 
     useEffect(() => {
@@ -293,7 +298,6 @@ function Modal({ isOpen, onClose }) {
         try {
             const response = await axios.get(`http://${cfg.domainname}:${cfg.serverport}/official/` + barangayId, { withCredentials: true });
             if (response.status !== 200) throw new Error("Something went wrong with fetching data");
-            console.log(response.data);
             setBarangayOfficials(response.data);
 
         } catch (error) {
@@ -306,7 +310,7 @@ function Modal({ isOpen, onClose }) {
         try {
             const response = await axios.get(`http://${cfg.domainname}:${cfg.serverport}/blotter/get-hearing-statuses/`, { withCredentials: true });
             if (response.status !== 200) throw new Error("Something went wrong with fetching data");
-            console.log(response.data);
+            setHearingStatuses(response.data);
         } catch (error) {
             console.error(error.message);
             setError(error.message);
@@ -314,11 +318,14 @@ function Modal({ isOpen, onClose }) {
     }
 
     const handleOnClose = () => {
+        setSelectedBarangayOfficial("");
+        setSelectedHearingStatus("");
         onClose();
     };
 
-    const clearSelectedBarangayOfficial = () => {
-        setSelectedBarangayOfficial("");
+
+    const handleSelectedHearingStatusesChange = (selectedValue) => {
+        setSelectedHearingStatus(selectedValue?.iname);
     };
 
     const handleSelectedBarangayOfficialsChange = (selectedValue) => {
@@ -329,7 +336,7 @@ function Modal({ isOpen, onClose }) {
 
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div className="bg-white w-full max-w-2xl rounded-lg shadow-lg p-6 max-h-[560px] min-h-[560px]">
+            <div className="bg-white w-full max-w-2xl rounded-lg shadow-lg p-6 min-h-[560px]">
                 <div className='flex justify-between mb-8'>
                     <h2 className="text-xl font-semibold">Record Session</h2>
                     <IoClose
@@ -353,6 +360,13 @@ function Modal({ isOpen, onClose }) {
                     </div>
                     <div className="mb-6">
                         <label className="block mb-2 text-base font-medium text-gray-500">Status<span className="text-red-600">*</span></label>
+                        <SearchDropdown
+                            options={hearingStatuses}
+                            selectedValue={selectedHearingStatus}
+                            onSelect={handleSelectedHearingStatusesChange}
+                            uniqueKey={"iname"}
+                            placeholder={"Search Status"}
+                            title="Select Hearing Status" />
                     </div>
                     <div className="col-span-full">
                         <label className="block mb-2 text-base font-medium text-gray-500">Resolution Remarks<span className="text-red-600">*</span></label>
