@@ -77,7 +77,7 @@ app.use('/location', locationRoutes)
 app.use('/certificate', certificateRoutes)
 app.use('/official', brgyOfficialsRoutes)
 
-const PORT = process.env.PORT || 8080;
+const PORT = cfg.serverport || 8080;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });

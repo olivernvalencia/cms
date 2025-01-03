@@ -28,7 +28,7 @@ export default function SearchModal({
 
     const fetchResidents = async () => {
         try {
-            const response = await axios.get(`http://${cfg.domainname}:8080/residents/` + barangayId, { withCredentials: true });
+            const response = await axios.get(`http://${cfg.domainname}:${cfg.serverport}/residents/` + barangayId, { withCredentials: true });
             setResidents(response.data);
         } catch (error) {
             console.error("Error fetching residents data:", error);

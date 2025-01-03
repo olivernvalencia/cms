@@ -26,9 +26,9 @@ const DashboardCard = () => {
     const { barangayId } = useAuth();
 
     const API_URLS = {
-        registeredVoters: `http://${cfg.domainname}:8080/stats/registered-voters/` + barangayId,
-        residentCount: `http://${cfg.domainname}:8080/stats/count/` + barangayId,
-        householdCount: `http://${cfg.domainname}:8080/stats/household/` + barangayId,
+        registeredVoters: `http://${cfg.domainname}:${cfg.serverport}/stats/registered-voters/` + barangayId,
+        residentCount: `http://${cfg.domainname}:${cfg.serverport}/stats/count/` + barangayId,
+        householdCount: `http://${cfg.domainname}:${cfg.serverport}/stats/household/` + barangayId,
     };
 
 

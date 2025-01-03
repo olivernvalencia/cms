@@ -1,3 +1,4 @@
 {
- "DomainName": "colo-cms.gov.ph"
+ "DomainName": "colo-cms.gov.ph",
+ "ServerPort": "8082"
 }

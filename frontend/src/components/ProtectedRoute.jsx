@@ -8,7 +8,7 @@ const ProtectedRoute = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        axios.get(`http://${cfg.domainname}:8080/home`, { withCredentials: true })
+        axios.get(`http://${cfg.domainname}:${cfg.serverport}/home`, { withCredentials: true })
             .then((res) => {
                 if (res.data.Status === 'Success') {
                     setIsAuthenticated(true);

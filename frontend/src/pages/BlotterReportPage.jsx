@@ -39,7 +39,7 @@ const IncidentReport = () => {
     async function fetchBlotters() {
         setLoading(true);
         try {
-            const response = await axios.get(`http://${cfg.domainname}:8080/blotter/` + barangayId, {
+            const response = await axios.get(`http://${cfg.domainname}:${cfg.serverport}/blotter/` + barangayId, {
                 withCredentials: true,
             });
             setBlotters(response.data);

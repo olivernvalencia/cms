@@ -13,6 +13,7 @@ import cfgData from './config.json' assert { type: "json" };
 const cfg = {
   ...cfgData,
   domainname: cfgData.DomainName,
+  serverport: cfgData.ServerPort
 };
 
 export default cfg;

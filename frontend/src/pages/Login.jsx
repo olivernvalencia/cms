@@ -31,7 +31,7 @@ const Login = () => {
             return;
         }
 
-        axios.post(`http://${cfg.domainname}:8080/login`, values, { withCredentials: true })
+        axios.post(`http://${cfg.domainname}:${cfg.serverport}/login`, values, { withCredentials: true })
             .then(res => {
                 if (res.data.Status === 'Success') {
                     setValues({ users: '', password: '' });

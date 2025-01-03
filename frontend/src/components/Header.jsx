@@ -17,7 +17,7 @@ const Header = () => {
     };
 
     useEffect(() => {
-        axios.get(`http://${cfg.domainname}:8080/home`, { withCredentials: true })
+        axios.get(`http://${cfg.domainname}:${cfg.serverport}/home`, { withCredentials: true })
             .then(res => {
                 if (res.data.Status === 'Success') {
                     setUser(res.data.user);
@@ -30,7 +30,7 @@ const Header = () => {
     }, []);
 
     const handleLogout = () => {
-        axios.get(`http://${cfg.domainname}:8080/logout`, { withCredentials: true })
+        axios.get(`http://${cfg.domainname}:${cfg.serverport}/logout`, { withCredentials: true })
             .then(res => {
                 if (res.data.Status === "Success") {
                     navigate('/');

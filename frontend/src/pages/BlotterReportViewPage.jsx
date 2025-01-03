@@ -45,7 +45,7 @@ const IncidentRepotViewPage = () => {
         try {
             setDetailsLoading(true);
             const response = await axios.get(
-                `http://${cfg.domainname}:8080/blotter/get/` +
+                `http://${cfg.domainname}:${cfg.serverport}/blotter/get/` +
                 blotter_id, {
                 withCredentials: true,
             });
@@ -61,7 +61,7 @@ const IncidentRepotViewPage = () => {
     const fetchBlotterHearings = async () => {
         try {
             setHearingLoading(true);
-            const response = await axios.get(`http://${cfg.domainname}:8080/blotter/get-hearing/` + blotter_id, {
+            const response = await axios.get(`http://${cfg.domainname}:${cfg.serverport}/blotter/get-hearing/` + blotter_id, {
                 withCredentials: true,
             });
             setBlotterHearingDetails(response.data);
@@ -291,7 +291,7 @@ function Modal({ isOpen, onClose }) {
 
     const fetchBarangayOfficials = async () => {
         try {
-            const response = await axios.get(`http://${cfg.domainname}:8080/official/` + barangayId, { withCredentials: true });
+            const response = await axios.get(`http://${cfg.domainname}:${cfg.serverport}/official/` + barangayId, { withCredentials: true });
             if (response.status !== 200) throw new Error("Something went wrong with fetching data");
             console.log(response.data);
             setBarangayOfficials(response.data);
@@ -304,7 +304,7 @@ function Modal({ isOpen, onClose }) {
 
     const fetchHearingStatuses = async () => {
         try {
-            const response = await axios.get(`http://${cfg.domainname}:8080/blotter/get-hearing-statuses/`, { withCredentials: true });
+            const response = await axios.get(`http://${cfg.domainname}:${cfg.serverport}/blotter/get-hearing-statuses/`, { withCredentials: true });
             if (response.status !== 200) throw new Error("Something went wrong with fetching data");
             console.log(response.data);
         } catch (error) {

@@ -13,7 +13,7 @@ const Register = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        axios.post(`http://${cfg.domainname}:8080/register`, values)
+        axios.post(`http://${cfg.domainname}:${cfg.serverport}/register`, values)
             .then(res => {
                 console.log(res);
                 setValues({ users: '', password: '' });
