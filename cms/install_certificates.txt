@@ -1,0 +1,21 @@
+--Create certificate
+New-SelfSignedCertificate -DnsName "colo-cms.gov.ph","192.168.254.111","localhost", "127.0.0.1" -CertStoreLocation "Cert:\LocalMachine\My" -FriendlyName "Maya Development Certificate" -NotAfter (Get-Date).AddYears(10)
+
+--Export certificate
+$cert = Get-ChildItem -Path "Cert:\LocalMachine\My" | Where-Object {$_.FriendlyName -eq "Maya Development Certificate"}
+$thumbprint = $cert.Thumbprint
+Write-Host "Thumbprint: $thumbprint"
+$pwd = ConvertTo-SecureString -String "May@T3ch2025" -Force -AsPlainText
+Export-PfxCertificate -Cert $cert -FilePath "C:\mayatech\cms\server\mayatech.pfx" -Password $pwd
+
+--Convert certificate
+openssl pkcs12 -in C:\mayatech\cms\server\mayatech.pfx -nocerts -out C:\mayatech\cms\server\colo-cms.gov.ph.key -nodes -passin pass:"May@T3ch2025"
+openssl pkcs12 -in C:\mayatech\cms\server\mayatech.pfx -nokeys -out C:\mayatech\cms\server\colo-cms.gov.ph.crt -passin pass:"May@T3ch2025"
+
+openssl pkcs12 -in mayatech.pfx -nocerts -out colo-cms.gov.ph.key -nodes -passin pass:"May@T3ch2025"
+openssl pkcs12 -in mayatech.pfx -nokeys -out colo-cms.gov.ph.crt -passin pass:"May@T3ch2025"
+
+--Delete
+$certToDelete = Get-ChildItem -Path Cert:\LocalMachine\My | Where-Object {$_.FriendlyName -eq "Maya Development Certificate"}
+Remove-Item -Path $certToDelete.PSPath
+Get-ChildItem -Path "Cert:\LocalMachine\My" | Where-Object {$_.FriendlyName -eq "Maya Development Certificate"}
